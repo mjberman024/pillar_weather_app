@@ -32,6 +32,10 @@ class Form extends Component {
           longitude: position.coords.latitude,
           latitude: position.coords.longitude,
         });
+        this.setState({
+          longitude: position.coords.latitude,
+          latitude: position.coords.longitude,
+        });
       });
     }
   }

@@ -5,6 +5,13 @@ import axios from 'axios';
 //API KEY: 82125ad85789ea94811b6f431b5e0191
 
 class Info extends Component {
+  constructor() {
+    super();
+    this.state = {
+      tempUnit: 'Farenheit',
+    };
+  }
+
   async getData() {
     const { data } = await axios.get(
       `http://api.openweathermap.org/data/2.5/forecast?q=${
@@ -16,6 +23,8 @@ class Info extends Component {
   }
 
   render() {
+    const tempF = ((this.props.data.temp - 273.15) * 9) / 5 + 32;
+
     return this.props.place || this.props.longitude ? (
       <div>
         {!this.props.longitude ? (
@@ -28,7 +37,7 @@ class Info extends Component {
           </div>
         )}
 
-        <p>Temperature: {this.props.data.temp}</p>
+        <p>Temperature: {tempF} </p>
         <p>Humidity: {this.props.data.humidity}</p>
         <p>Pressure: {this.props.data.pressure}</p>
       </div>

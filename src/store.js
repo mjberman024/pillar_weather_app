@@ -4,7 +4,7 @@ import loggingMiddleware from 'redux-logger';
 import thunkMiddleware from 'redux-thunk';
 
 const initialState = {
-  place: 'New York',
+  place: '',
   longitude: '',
   latitude: '',
   data: {},
