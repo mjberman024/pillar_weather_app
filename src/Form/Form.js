@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {
   getWeatherDataUsingPlace,
   getWeatherDataUsingLatandLong,
+  getWeatherDataUsingZip,
 } from '../store';
 import { connect } from 'react-redux';
 
@@ -13,6 +14,7 @@ class Form extends Component {
       place: '',
       longitude: '',
       latitude: '',
+      zip: '',
     };
   }
 
@@ -46,16 +48,21 @@ class Form extends Component {
     e.preventDefault();
     if (e.target.name === 'place') {
       this.props.getWeatherDataPlace(this.state.place);
-    } else {
+    } else if (e.target.name === 'latAndLong') {
       this.props.getWeatherDataLatLong({
         longitude: this.state.longitude,
         latitude: this.state.latitude,
+      });
+    } else {
+      this.props.getWeatherDataZip({
+        zip: this.state.zip,
       });
     }
     this.setState({
       place: '',
       longitude: '',
       latitude: '',
+      zip: '',
     });
   };
 
@@ -74,6 +81,20 @@ class Form extends Component {
           <br />
           <button type="submit">Search By Place</button>
         </form>
+        <br />
+        <form name="zip" onSubmit={this.handleSubmit}>
+          <label htmlFor="zip">Zipcode: </label>
+          <input
+            type="text"
+            name="zip"
+            value={this.state.zip}
+            onChange={this.handleChange}
+            required={true}
+          />
+          <br />
+          <button type="submit">Search By zip</button>
+        </form>
+
         <form name="latAndLong" onSubmit={this.handleSubmit}>
           <br />
           <label htmlFor="place">Longitude: </label>
@@ -105,6 +126,7 @@ const mapDispatchToProps = dispatch => ({
   getWeatherDataPlace: place => dispatch(getWeatherDataUsingPlace(place)),
   getWeatherDataLatLong: latLong =>
     dispatch(getWeatherDataUsingLatandLong(latLong)),
+  getWeatherDataZip: zip => dispatch(getWeatherDataUsingZip(zip)),
 });
 
 export default connect(

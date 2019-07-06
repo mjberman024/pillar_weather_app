@@ -11,6 +11,7 @@ const initialState = {
 
 const UPDATE_PLACE = 'UPDATE_PLACE';
 const UPDATE_LONG_AND_LAT = 'UPDATE_LONGITUDE_AND_LATITUDE';
+const UPDATE_ZIP = 'UPDATE_ZIP';
 
 const updatePlace = (place, data, longAndLat) => {
   return {
@@ -26,6 +27,16 @@ const updateLongAndLat = (longAndLat, data, place) => {
     type: UPDATE_LONG_AND_LAT,
     longAndLat,
     data,
+    place,
+  };
+};
+
+const updateZip = (zip, data, longAndLat, place) => {
+  return {
+    type: UPDATE_ZIP,
+    zip,
+    data,
+    longAndLat,
     place,
   };
 };
@@ -48,6 +59,16 @@ export const getWeatherDataUsingLatandLong = longAndLat => async dispatch => {
   dispatch(updateLongAndLat(longAndLat, data.main, data.name));
 };
 
+export const getWeatherDataUsingZip = zip => async dispatch => {
+  const { data } = await axios.get(
+    `http://api.openweathermap.org/data/2.5/weather?zip=${
+      zip.zip
+    },us&APPID=82125ad85789ea94811b6f431b5e0191`
+  );
+
+  dispatch(updateZip(zip, data.main, data.coord, data.name));
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_PLACE:
@@ -64,6 +85,14 @@ const reducer = (state = initialState, action) => {
         place: action.place,
         longitude: action.longAndLat.longitude,
         latitude: action.longAndLat.latitude,
+        data: action.data,
+      };
+    case UPDATE_ZIP:
+      return {
+        ...state,
+        longitude: action.longAndLat.lon,
+        latitude: action.longAndLat.lat,
+        place: action.place,
         data: action.data,
       };
     default:
