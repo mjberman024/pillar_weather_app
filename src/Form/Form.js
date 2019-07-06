@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
-export default class Form extends Component {
+import { updatePlace, updateLongAndLat } from '../store';
+import { connect } from 'react-redux';
+
+class Form extends Component {
   constructor() {
     super();
     this.state = {
@@ -8,57 +11,104 @@ export default class Form extends Component {
       longitude: '',
       latitude: '',
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.placeChange = this.placeChange.bind(this);
+    this.longAndLatChange = this.longAndLatChange.bind(this);
+    this.handlePlaceSubmit = this.handlePlaceSubmit.bind(this);
+    this.handleLatAndLongSubmit = this.handleLatAndLongSubmit.bind(this);
   }
 
-  handleChange(e) {
+  placeChange(e) {
     this.setState({
       [e.target.name]: e.target.value,
     });
   }
 
-  handleSubmit(e) {
+  longAndLatChange(e) {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  handlePlaceSubmit(e) {
     e.preventDefault();
+    this.props.updatePlace(this.state.place);
     this.setState({
       place: '',
       longitude: '',
       latitude: '',
     });
-    console.log(this.state);
+  }
+  async handleLatAndLongSubmit(e) {
+    this.props.updateLongAndLat({
+      longitude: this.state.longitude,
+      latitude: this.state.latitude,
+    });
+    e.preventDefault();
+    await this.setState({
+      place: '',
+      longitude: '',
+      latitude: '',
+    });
   }
 
   render() {
     return (
       <div>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handlePlaceSubmit}>
           <label htmlFor="place">Place: </label>
           <input
             type="text"
             name="place"
             value={this.state.place}
-            onChange={this.handleChange}
+            onChange={this.placeChange}
+            required={true}
           />
+          <br />
+          <button type="submit">Search By Place</button>
+        </form>
+        <form onSubmit={this.handleLatAndLongSubmit}>
           <br />
           <label htmlFor="place">Longitude: </label>
           <input
             type="text"
             name="longitude"
             value={this.state.longitude}
-            onChange={this.handleChange}
+            onChange={this.longAndLatChange}
+            required={true}
           />
-          <br />
+
           <label htmlFor="place">Latitude: </label>
           <input
             type="text"
             name="latitude"
             value={this.state.latitude}
-            onChange={this.handleChange}
+            onChange={this.longAndLatChange}
+            required={true}
           />
           <br />
-          <button type="submit">Submit</button>
+          <button type="submit">Search by Latitude and Longitude</button>
         </form>
       </div>
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    place: state.place,
+    longitude: state.longitude,
+    latitude: state.latitude,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updatePlace: place => dispatch(updatePlace(place)),
+    updateLongAndLat: longAndLat => dispatch(updateLongAndLat(longAndLat)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Form);
