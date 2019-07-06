@@ -5,43 +5,48 @@ class Info extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      temp: this.props.data.temp,
+      temp: 0,
       tempUnit: 'Farenheit',
     };
   }
 
-  toggleTemp = () => {
-    let unit = this.state.tempUnit === 'Farenheit' ? 'Celsius' : 'Farenheit';
-    if (unit === 'Farenheit') {
+  toggleTemp = temp => {
+    if (this.state.tempUnit === 'Farenheit') {
+      temp = (this.props.data.temp - 273.15).toFixed(2);
+    } else {
+      temp = ((this.props.data.temp - 273.15) * (9 / 5) + 32).toFixed(2);
     }
+    let unit = this.state.tempUnit === 'Farenheit' ? 'Celsius' : 'Farenheit';
     this.setState({
       tempUnit: unit,
-      temp: 0,
+      temp,
     });
   };
   render() {
-    const tempF = 1.8 * (this.props.data.temp - 273.15) + 32;
+    const { place, longitude, latitude } = this.props;
+    const { temp, humidity, pressure } = this.props.data;
+
+    let temperature =
+      this.state.temp ||
+      ((this.props.data.temp - 273.15) * (9 / 5) + 32).toFixed(2);
     return (
       <div>
-        <div>
-          <p>Place: {this.props.place}</p>
-          <p>Longitude: {this.props.longitude}</p>
-          <p>Latitude: {this.props.latitude}</p>
-        </div>
-
+        <p>Place: {place}</p>
+        <p>Longitude: {longitude}</p>
+        <p>Latitude: {latitude}</p>
         <p>
-          Temperature: {tempF.toFixed(1)}
+          Temperature: {temperature}
           {this.state.tempUnit === 'Farenheit' ? '°F' : '°C'}
           <span>
-            <button onClick={this.toggleTemp}>
+            <button onClick={() => this.toggleTemp(temp)}>
               <span>{`Convert to: ${
                 this.state.tempUnit === 'Farenheit' ? 'Celsius' : 'Farenheit'
               }`}</span>
             </button>
           </span>
         </p>
-        <p>Humidity: {this.props.data.humidity}</p>
-        <p>Pressure: {this.props.data.pressure}</p>
+        <p>Humidity: {humidity}</p>
+        <p>Pressure: {pressure}</p>
       </div>
     );
   }

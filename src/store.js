@@ -12,11 +12,12 @@ const initialState = {
 const UPDATE_PLACE = 'UPDATE_PLACE';
 const UPDATE_LONG_AND_LAT = 'UPDATE_LONGITUDE_AND_LATITUDE';
 
-const updatePlace = (place, data) => {
+const updatePlace = (place, data, longAndLat) => {
   return {
     type: UPDATE_PLACE,
     place,
     data,
+    longAndLat,
   };
 };
 
@@ -36,8 +37,7 @@ export const getWeatherDataUsingPlace = place => async dispatch => {
   const { data } = await axios.get(
     `http://api.openweathermap.org/data/2.5/weather?q=${place}&APPID=82125ad85789ea94811b6f431b5e0191`
   );
-
-  dispatch(updatePlace(place, data.main));
+  dispatch(updatePlace(place, data.main, data.coord));
 };
 
 export const getWeatherDataUsingLatandLong = longAndLat => async dispatch => {
@@ -53,7 +53,8 @@ const reducer = (state = initialState, action) => {
     case UPDATE_PLACE:
       return {
         ...state,
-        longitude: '',
+        longitude: action.longAndLat.lon,
+        latitude: action.longAndLat.lat,
         place: action.place,
         data: action.data,
       };
