@@ -1,44 +1,80 @@
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import axios from 'axios';
+import loggingMiddleware from 'redux-logger';
+import thunkMiddleware from 'redux-thunk';
 
 const initialState = {
-  place: '',
+  place: 'balitmore',
   longitude: '',
   latitude: '',
+  data: {},
 };
 
 const UPDATE_PLACE = 'UPDATE_PLACE';
 const UPDATE_LONG_AND_LAT = 'UPDATE_LONGITUDE_AND_LATITUDE';
 
-export const updatePlace = place => {
+const updatePlace = (place, data) => {
   return {
     type: UPDATE_PLACE,
+    place,
+    data,
+  };
+};
+
+const updateLongAndLat = (longAndLat, data, place) => {
+  return {
+    type: UPDATE_LONG_AND_LAT,
+    longAndLat,
+    data,
     place,
   };
 };
 
-export const updateLongAndLat = longAndLat => {
-  return {
-    type: UPDATE_LONG_AND_LAT,
-    payload: longAndLat,
-  };
+//I AM AWARE THAT THE API KEY IS NOT SECURE.
+// I WOULD MAKE A SECRETS FILE, AND PUT IT IN .GITIGNORE
+
+export const getWeatherDataUsingPlace = place => async dispatch => {
+  //logic to see if place or lat / long
+
+  const { data } = await axios.get(
+    `http://api.openweathermap.org/data/2.5/weather?q=${place}&APPID=82125ad85789ea94811b6f431b5e0191`
+  );
+
+  dispatch(updatePlace(place, data.main));
+};
+
+export const getWeatherDataUsingLatandLong = longAndLat => async dispatch => {
+  //logic to see if place or lat / long
+  const { longitude, latitude } = longAndLat;
+  const { data } = await axios.get(
+    `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&APPID=82125ad85789ea94811b6f431b5e0191`
+  );
+  dispatch(updateLongAndLat(longAndLat, data.main, data.name));
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_PLACE:
-      return { ...state, place: action.place };
+      return {
+        ...state,
+        longitude: '',
+        place: action.place,
+        data: action.data,
+      };
     case UPDATE_LONG_AND_LAT:
       return {
         ...state,
-        place: '',
-        longitude: action.payload.longitude,
-        latitude: action.payload.latitude,
+        place: action.place,
+        longitude: action.longAndLat.longitude,
+        latitude: action.longAndLat.latitude,
+        data: action.data,
       };
     default:
       return state;
   }
 };
 
-const store = createStore(reducer);
+const middlewares = applyMiddleware(loggingMiddleware, thunkMiddleware);
+const store = createStore(reducer, middlewares);
 
 export default store;

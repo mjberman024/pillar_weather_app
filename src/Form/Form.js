@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
-import { updatePlace, updateLongAndLat } from '../store';
+import {
+  getWeatherDataUsingPlace,
+  getWeatherDataUsingLatandLong,
+} from '../store';
 import { connect } from 'react-redux';
 
 class Form extends Component {
@@ -31,7 +34,7 @@ class Form extends Component {
 
   handlePlaceSubmit(e) {
     e.preventDefault();
-    this.props.updatePlace(this.state.place);
+    this.props.getWeatherDataPlace(this.state.place);
     this.setState({
       place: '',
       longitude: '',
@@ -39,7 +42,7 @@ class Form extends Component {
     });
   }
   async handleLatAndLongSubmit(e) {
-    this.props.updateLongAndLat({
+    this.props.getWeatherDataLatLong({
       longitude: this.state.longitude,
       latitude: this.state.latitude,
     });
@@ -101,12 +104,11 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updatePlace: place => dispatch(updatePlace(place)),
-    updateLongAndLat: longAndLat => dispatch(updateLongAndLat(longAndLat)),
-  };
-};
+const mapDispatchToProps = dispatch => ({
+  getWeatherDataPlace: place => dispatch(getWeatherDataUsingPlace(place)),
+  getWeatherDataLatLong: latLong =>
+    dispatch(getWeatherDataUsingLatandLong(latLong)),
+});
 
 export default connect(
   mapStateToProps,
