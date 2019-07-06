@@ -14,64 +14,55 @@ class Form extends Component {
       longitude: '',
       latitude: '',
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handlePlaceSubmit = this.handlePlaceSubmit.bind(this);
-    this.handleLatAndLongSubmit = this.handleLatAndLongSubmit.bind(this);
-    this.getMyLocation = this.getMyLocation.bind(this);
   }
 
   componentDidMount() {
     this.getMyLocation();
   }
 
-  getMyLocation() {
+  getMyLocation = () => {
     const location = window.navigator && window.navigator.geolocation;
     if (location) {
       location.getCurrentPosition(position => {
         this.props.getWeatherDataLatLong({
-          longitude: position.coords.latitude,
-          latitude: position.coords.longitude,
+          longitude: position.coords.longitude.toFixed(2),
+          latitude: position.coords.latitude.toFixed(2),
         });
         this.setState({
-          longitude: position.coords.latitude,
-          latitude: position.coords.longitude,
+          longitude: position.coords.longitude.toFixed(2),
+          latitude: position.coords.latitude.toFixed(2),
         });
       });
     }
-  }
+  };
 
-  handleChange(e) {
+  handleChange = e => {
     this.setState({
       [e.target.name]: e.target.value,
     });
-  }
+  };
 
-  handlePlaceSubmit(e) {
+  handleSubmit = e => {
     e.preventDefault();
-    this.props.getWeatherDataPlace(this.state.place);
+    if (e.target.name === 'place') {
+      this.props.getWeatherDataPlace(this.state.place);
+    } else {
+      this.props.getWeatherDataLatLong({
+        longitude: this.state.longitude,
+        latitude: this.state.latitude,
+      });
+    }
     this.setState({
       place: '',
       longitude: '',
       latitude: '',
     });
-  }
-  async handleLatAndLongSubmit(e) {
-    this.props.getWeatherDataLatLong({
-      longitude: this.state.longitude,
-      latitude: this.state.latitude,
-    });
-    e.preventDefault();
-    await this.setState({
-      place: '',
-      longitude: '',
-      latitude: '',
-    });
-  }
+  };
 
   render() {
     return (
       <div>
-        <form onSubmit={this.handlePlaceSubmit}>
+        <form name="place" onSubmit={this.handleSubmit}>
           <label htmlFor="place">Place: </label>
           <input
             type="text"
@@ -83,7 +74,7 @@ class Form extends Component {
           <br />
           <button type="submit">Search By Place</button>
         </form>
-        <form onSubmit={this.handleLatAndLongSubmit}>
+        <form name="latAndLong" onSubmit={this.handleSubmit}>
           <br />
           <label htmlFor="place">Longitude: </label>
           <input
@@ -110,14 +101,6 @@ class Form extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    place: state.place,
-    longitude: state.longitude,
-    latitude: state.latitude,
-  };
-};
-
 const mapDispatchToProps = dispatch => ({
   getWeatherDataPlace: place => dispatch(getWeatherDataUsingPlace(place)),
   getWeatherDataLatLong: latLong =>
@@ -125,6 +108,6 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(Form);

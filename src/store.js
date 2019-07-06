@@ -1,6 +1,5 @@
 import { createStore, applyMiddleware } from 'redux';
 import axios from 'axios';
-import loggingMiddleware from 'redux-logger';
 import thunkMiddleware from 'redux-thunk';
 
 const initialState = {
@@ -34,8 +33,6 @@ const updateLongAndLat = (longAndLat, data, place) => {
 // I WOULD MAKE A SECRETS FILE, AND PUT IT IN .GITIGNORE
 
 export const getWeatherDataUsingPlace = place => async dispatch => {
-  //logic to see if place or lat / long
-
   const { data } = await axios.get(
     `http://api.openweathermap.org/data/2.5/weather?q=${place}&APPID=82125ad85789ea94811b6f431b5e0191`
   );
@@ -44,8 +41,7 @@ export const getWeatherDataUsingPlace = place => async dispatch => {
 };
 
 export const getWeatherDataUsingLatandLong = longAndLat => async dispatch => {
-  //logic to see if place or lat / long
-  const { longitude, latitude } = longAndLat;
+  const { latitude, longitude } = longAndLat;
   const { data } = await axios.get(
     `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&APPID=82125ad85789ea94811b6f431b5e0191`
   );
@@ -74,7 +70,7 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-const middlewares = applyMiddleware(loggingMiddleware, thunkMiddleware);
+const middlewares = applyMiddleware(thunkMiddleware);
 const store = createStore(reducer, middlewares);
 
 export default store;
