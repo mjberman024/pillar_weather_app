@@ -14,19 +14,29 @@ class Form extends Component {
       longitude: '',
       latitude: '',
     };
-    this.placeChange = this.placeChange.bind(this);
-    this.longAndLatChange = this.longAndLatChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.handlePlaceSubmit = this.handlePlaceSubmit.bind(this);
     this.handleLatAndLongSubmit = this.handleLatAndLongSubmit.bind(this);
+    this.getMyLocation = this.getMyLocation.bind(this);
   }
 
-  placeChange(e) {
-    this.setState({
-      [e.target.name]: e.target.value,
-    });
+  componentDidMount() {
+    this.getMyLocation();
   }
 
-  longAndLatChange(e) {
+  getMyLocation() {
+    const location = window.navigator && window.navigator.geolocation;
+    if (location) {
+      location.getCurrentPosition(position => {
+        this.props.getWeatherDataLatLong({
+          longitude: position.coords.latitude,
+          latitude: position.coords.longitude,
+        });
+      });
+    }
+  }
+
+  handleChange(e) {
     this.setState({
       [e.target.name]: e.target.value,
     });
@@ -63,7 +73,7 @@ class Form extends Component {
             type="text"
             name="place"
             value={this.state.place}
-            onChange={this.placeChange}
+            onChange={this.handleChange}
             required={true}
           />
           <br />
@@ -76,7 +86,7 @@ class Form extends Component {
             type="text"
             name="longitude"
             value={this.state.longitude}
-            onChange={this.longAndLatChange}
+            onChange={this.handleChange}
             required={true}
           />
 
@@ -85,7 +95,7 @@ class Form extends Component {
             type="text"
             name="latitude"
             value={this.state.latitude}
-            onChange={this.longAndLatChange}
+            onChange={this.handleChange}
             required={true}
           />
           <br />
